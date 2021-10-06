@@ -54,7 +54,7 @@ def main(train_path, valid_path, save_path):
     # Plot decision boundary on top of validation set set
     util.plot(x_eval, y_eval, clf.theta, 'output/problem1b{}.png'.format(save_path[-5]))
     
-    np.savetxt(save_path, y_pred > 0.5, fmt='%d')
+    np.savetxt(save_path, y_pred , fmt='%d')
     
     # Use np.savetxt to save predictions on eval set to save_path
 

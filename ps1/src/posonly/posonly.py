@@ -37,7 +37,7 @@ def main(train_path, valid_path, test_path, save_path):
     clf.fit(x_train, t_train)
     
     x_test, t_test = util.load_dataset(test_path, label_col='t', add_intercept=True)
-    util.plot(x_test, t_test, clf.theta, 'output/ps1p2a.png')
+    util.plot(x_test, t_test, clf.theta, 'output/ps1p2a.png', title="2a,ideal (fully observed) cased")
     
     t_pred = clf.predict(x_test)
     
@@ -50,7 +50,7 @@ def main(train_path, valid_path, test_path, save_path):
     clf2.fit(x_train, y_train)
     
     x_test, y_test = util.load_dataset(test_path, label_col='y', add_intercept=True)
-    util.plot(x_test, t_test, clf2.theta, 'output/ps1p2b.png')
+    util.plot(x_test, t_test, clf2.theta, 'output/ps1p2b.png', title="2b, Naive method on partial label")
     
     t_pred = clf2.predict(x_test)
     np.savetxt(output_path_naive, t_pred , fmt='%d')
@@ -58,6 +58,15 @@ def main(train_path, valid_path, test_path, save_path):
     # Make sure to save predicted probabilities to output_path_naive using np.savetxt()
     # Part (f): Apply correction factor using validation set and test on true labels
     # Plot and use np.savetxt to save outputs to output_path_adjusted
+    x_valid, y_valid = util.load_dataset(valid_path, label_col='y', add_intercept=True)
+    Vplus=x_valid[y_valid==1]
+    alpha = np.sum(clf2.predict(Vplus))/len(Vplus)
+    t_pred = clf2.predict(x_test)
+    t_pred/=alpha
+    np.savetxt(output_path_adjusted, t_pred , fmt='%d')
+    
+    util.plot(x_test, t_test, clf2.theta, 'output/ps1p2f.png',alpha, title="2f Adjusted probability with alpha")
+    
     # *** END CODER HERE
 
 if __name__ == '__main__':

@@ -26,6 +26,8 @@ class LinearModel(object):
             y: Training example labels. Shape (n_examples,).
         """
         # *** START CODE HERE ***
+        # solve for theta in normal equation X^T * X theta = X^T * Y
+        self.theta = np.linalg.solve(np.matmul(np.transpose(X), X), np.matmul(np.transpose(X), y))
         # *** END CODE HERE ***
 
     def create_poly(self, k, X):
@@ -38,9 +40,16 @@ class LinearModel(object):
             X: Training example inputs. Shape (n_examples, 2).
         """
         # *** START CODE HERE ***
+        power = range(k + 1)
+        output = np.ones((X.size, k + 1))
+
+        for i in range(X.size):
+            output[i, :] = X[i] ** power
+        return output
         # *** END CODE HERE ***
 
     def create_sin(self, k, X):
+        import math
         """
         Generates a sin with polynomial featuremap to the data x.
         Output should be a numpy array whose shape is (n_examples, k+2)
@@ -49,6 +58,12 @@ class LinearModel(object):
             X: Training example inputs. Shape (n_examples, 2).
         """
         # *** START CODE HERE ***
+        power = range(k + 1)
+        output_sin = np.ones((X.size, k + 2))
+        for i in range(X.size):
+            output_sin[i, 0:-1] = X[i] ** power
+            output_sin[i][-1] = math.sin(X[i])
+        return output_sin
         # *** END CODE HERE ***
 
     def predict(self, X):
@@ -63,6 +78,7 @@ class LinearModel(object):
             Outputs of shape (n_examples,).
         """
         # *** START CODE HERE ***
+        return np.matmul(X, self.theta)
         # *** END CODE HERE ***
 
 
@@ -78,6 +94,13 @@ def run_exp(train_path, sine=False, ks=[1, 2, 3, 5, 10, 20], filename='plot.png'
         Our objective is to train models and perform predictions on plot_x data
         '''
         # *** START CODE HERE ***
+        lm = LinearModel()
+        if sine:
+            lm.fit(lm.create_sin(k, train_x[:, 1]), train_y)
+            plot_y = lm.predict(lm.create_sin(k, plot_x[:, 1]))
+        else:
+            lm.fit(lm.create_poly(k, train_x[:, 1]), train_y)
+            plot_y = lm.predict(lm.create_poly(k, plot_x[:, 1]))
         # *** END CODE HERE ***
         '''
         Here plot_y are the predictions of the linear model on the plot_x data
@@ -95,6 +118,14 @@ def main(train_path, small_path, eval_path):
     Run all expetriments
     '''
     # *** START CODE HERE ***
+    # 5b k = [3]
+    run_exp(train_path = 'train.csv', sine = False, ks = [3], filename = 'ps1_5b.png')
+    # 5c k = [3, 5, 10, 20]
+    run_exp(train_path = 'train.csv', sine = False, ks = [3, 5, 10, 20], filename = 'ps1_5c')
+    # 5d sin featuremap, k = [0, 1, 2, 3, 5, 10, 20]
+    run_exp(train_path = 'train.csv', sine = True, ks = [0, 1, 2, 3, 5, 10, 20], filename = 'ps1_5d')
+    # 53 k = [1, 2, 5, 10, 20], small dataset
+    run_exp(train_path = 'small.csv', sine = False, ks = [1, 2, 5, 10, 20], filename = 'ps1_5e')
     # *** END CODE HERE ***
 
 if __name__ == '__main__':
