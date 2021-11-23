@@ -134,8 +134,9 @@ def choose_action(state, mdp_data):
     value0 = np.dot(mdp_data['transition_probs'][state,:,0],mdp_data['value'])
     value1 = np.dot(mdp_data['transition_probs'][state,:,1],mdp_data['value'])
     if value0==value1:
-        #return np.random.randint(2)
-        return 0
+        #np.random.randint(2)
+        return np.random.randint(2)
+        # return 1
     elif value0>value1:
         return 0
     else:
@@ -246,9 +247,9 @@ def update_mdp_value(mdp_data, tolerance, gamma):
     return iter==1
     # *** END CODE HERE ***
 
-def main(plot=True):
+def main(plot=True,seed = 0):
     # Seed the randomness of the simulation so this outputs the same thing each time
-    np.random.seed(0)
+    np.random.seed(seed)
 
     # Simulation parameters
     pause_time = 0.0001
@@ -339,7 +340,8 @@ def main(plot=True):
             num_failures += 1
             if num_failures >= max_failures:
                 break
-            print('[INFO] Failure number {}'.format(num_failures))
+            if num_failures%60 == 0:
+                print('[INFO] Failure number {}'.format(num_failures))
             time_steps_to_failure.append(time - time_at_start_of_current_trial)
             # time_steps_to_failure[num_failures] = time - time_at_start_of_current_trial
             time_at_start_of_current_trial = time
@@ -355,7 +357,7 @@ def main(plot=True):
             state = cart_pole.get_state(state_tuple)
         else:
             state = new_state
-
+    print('[INFO] Failure number {}'.format(num_failures))
     if plot:
         # plot the learning curve (time balanced vs. trial)
         log_tstf = np.log(np.array(time_steps_to_failure))
@@ -367,7 +369,9 @@ def main(plot=True):
         plt.plot(x, weights[window:len(log_tstf)], 'r--')
         plt.xlabel('Num failures')
         plt.ylabel('Log of num steps to failure')
+        plt.title("seed :{}".format(seed))
         plt.savefig('./control.pdf')
+        plt.show()
 
     return np.array(time_steps_to_failure)
     
